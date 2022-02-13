@@ -13,7 +13,12 @@ const tests = [
     name: 'array-with-type-aliases'
   },
   {
+    only: false,
     name: 'array-in-types'
+  },
+  {
+    only: false,
+    name: 'array-in-types-default-field'
   },
   {
     only: false,
@@ -30,6 +35,10 @@ const tests = [
   {
     only: false,
     name: 'enum-as-properties'
+  },
+  {
+    only: false,
+    name: 'elements'
   }
 ]
 describe('Apidoc TS Plugin', () => {

@@ -19,13 +19,13 @@ interface EnumInterface {
 /**
  * @api {get} /api/:id
  * @apiParam {SquareEnumConfig} id Unique ID.
- * @apiInterface {SquareEnumConfigsInterface}
+ * @apiSuccessInterface {SquareEnumConfigsInterface}
  * @apiGroup enumAsProperties
  */
 
 /**
  * @api {get} /api/:id
  * @apiParam {SquareEnumConfig} id Unique ID.
- * @apiInterface {EnumInterface}
+ * @apiSuccessInterface {EnumInterface}
  * @apiGroup enumAsProperties
  */

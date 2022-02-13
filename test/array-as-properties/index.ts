@@ -14,13 +14,13 @@ interface SquareConfigsGeneric {
 /**
  * @api {get} /api/:id
  * @apiParam {SquareConfig} id Unique ID.
- * @apiInterface {SquareConfigsInterface}
+ * @apiSuccessInterface {SquareConfigsInterface}
  * @apiGroup arrayAsInterface
  */
 
 /**
  * @api {get} /api/:id
  * @apiParam {SquareConfig} id Unique ID.
- * @apiInterface {SquareConfigsGeneric}
+ * @apiSuccessInterface {SquareConfigsGeneric}
  * @apiGroup arrayGenericsTest
  */
