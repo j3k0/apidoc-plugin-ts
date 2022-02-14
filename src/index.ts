@@ -169,7 +169,7 @@ function parse (content: string, elementName: string): ParseResult | null {
     element: APIDOC_ELEMENT_BY_CUSTOM_ELEMENT_NAME[elementName],
     path: matches[1],
     interface: matches[2],
-    field: matches[3],
+    field: matches[3] || '',
     description: matches[4] || ''
   }
 }
