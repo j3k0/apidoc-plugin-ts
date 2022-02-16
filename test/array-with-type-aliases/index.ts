@@ -8,6 +8,6 @@ type SquareConfigsType = SquareConfig[]
 /**
  * @api {get} /api/:id
  * @apiParam {SquareConfig} id Unique ID.
- * @apiInterface {SquareConfigsType}
+ * @apiSuccessInterface {SquareConfigsType}
  * @apiGroup arrayAsType
  */

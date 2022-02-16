@@ -8,6 +8,6 @@ export namespace FirstNamespace {
 
 /**
  * @api {get} /api/:id
- * @apiInterface {FirstNamespace.SecondNamespace.Result} namespaced value
+ * @apiSuccessInterface {FirstNamespace.SecondNamespace.Result} namespaced value
  * @apiGroup Interface inside namespace
  */

@@ -1,0 +1,52 @@
+[
+  {
+    "type": "post",
+    "url": "/api",
+    "title": "",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "p1",
+            "description": "<p><code>p1</code></p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "p2",
+            "description": "<p><code>p2</code></p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "r1",
+            "description": "<p><code>r1</code></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "r2",
+            "description": "<p><code>r2</code></p>"
+          }
+        ]
+      }
+    },
+    "group": "elementsTest",
+    "version": "0.0.0",
+    "filename": "elements/index.ts",
+    "groupTitle": "elementsTest",
+    "name": "PostApi"
+  }
+]

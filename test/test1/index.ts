@@ -6,7 +6,7 @@ interface SquareConfig {
 /**
  * @api {get} /api/:id
  * @apiParam {SquareConfig} id Unique ID.
- * @apiInterface {SquareConfig}
+ * @apiSuccessInterface {SquareConfig}
  * @apiGroup localInterfaceTest
  */
 export function localInterfaceTest (): SquareConfig {
@@ -16,7 +16,7 @@ export function localInterfaceTest (): SquareConfig {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface (./interfaces.ts) { InnerSquare }
+ * @apiSuccessInterface (./interfaces.ts) { InnerSquare }
  * @apiGroup extendInterfaceTest
  */
 export function extendInterfaceTest () {
@@ -26,7 +26,7 @@ export function extendInterfaceTest () {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface (./interfaces.ts) { Employer }
+ * @apiSuccessInterface (./interfaces.ts) { Employer }
  * @apiGroup importedInterfaceTest
  */
 export function importedInterfaceTest () {
@@ -36,7 +36,7 @@ export function importedInterfaceTest () {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface (./interfaces.ts) { TeamPicks }
+ * @apiSuccessInterface (./interfaces.ts) { TeamPicks }
  * @apiGroup deepExtendsInterfaceTest
  */
 export function deepExtendsInterfaceTest () {
@@ -46,7 +46,7 @@ export function deepExtendsInterfaceTest () {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface (./interfaces.ts) { SearchResult }
+ * @apiSuccessInterface (./interfaces.ts) { SearchResult }
  * @apiGroup deepExternalInterfaceTest
  */
 export function deepExternalInterfaceTest () {
@@ -56,7 +56,7 @@ export function deepExternalInterfaceTest () {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface (./interfaces.ts) {ShapedSkill}
+ * @apiSuccessInterface (./interfaces.ts) {ShapedSkill}
  * @apiGroup multipleInheritanceTest
  */
 export function multipleInheritanceTest () {
@@ -66,7 +66,7 @@ export function multipleInheritanceTest () {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface (./interfaces.ts) {CustomNamespace.ComposedInterface}
+ * @apiSuccessInterface (./interfaces.ts) {CustomNamespace.ComposedInterface}
  * @apiGroup namespacedInterfaceTest
  */
 export function namespacedInterfaceTest () {
@@ -78,7 +78,7 @@ export function namespacedInterfaceTest () {
 //
 //  * @api {get} /api/:id
 //  * @apiParam {Number} id Unique ID.
-//  * @apiInterface (./interfaces.ts) {GenericInterface<boolean>}
+//  * @apiSuccessInterface (./interfaces.ts) {GenericInterface<boolean>}
 //  * @apiGroup genericInterfaceTest
 //
 // export function genericInterfaceTest () {
@@ -89,7 +89,7 @@ export function namespacedInterfaceTest () {
 /**
  * @api {get} /api/:id
  * @apiParam {Number} id Unique ID.
- * @apiInterface {X}
+ * @apiSuccessInterface {X}
  * @apiGroup notFoundTest
  */
 export function notFoundTest () {

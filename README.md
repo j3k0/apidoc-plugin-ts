@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/geoblink/apidoc-plugin-ts.svg?branch=master)](https://travis-ci.org/geoblink/apidoc-plugin-ts)
 [![npm](https://img.shields.io/npm/v/@geoblink/apidoc-plugin-ts.svg)](https://www.npmjs.com/package/@geoblink/apidoc-plugin-ts) [![Greenkeeper badge](https://badges.greenkeeper.io/geoblink/apidoc-plugin-ts.svg)](https://greenkeeper.io/)
 
-A plugin for [apidoc](https://www.npmjs.com/package/apidoc) that injects `@apiSuccess` params from TypeScript interfaces.
+A plugin for [apidoc](https://www.npmjs.com/package/apidoc) that injects params like `@apiSuccess` and `@apiParam` from TypeScript interfaces.
 Supports extended and nested interfaces.
 
 ## Getting started
@@ -16,10 +16,14 @@ npm install --save-dev apidoc @geoblink/apidoc-plugin-ts
 yarn add -D apidoc @geoblink/apidoc-plugin-ts
 ```
 
-A custom api-doc param `@apiInterface` is exposed:
+The following custom api-doc params are exposed:
+- `@apiParamInterface`
+- `@apiQueryInterface`
+- `@apiBodyInterface`
+- `@apiSuccessInterface`
 
 ```javascript
-@apiInterface (optional path to definitions file) {INTERFACE_NAME}
+@CUSTOM_PARAM (optional path to definitions file) {INTERFACE_NAME}
  ```
 
 ## Example
@@ -47,14 +51,14 @@ export interface Employer {
 and the following custom param:
 
 ```javascript
-@apiInterface (./employers.ts) {Person}
+@apiSuccessInterface (./employers.ts) {Person}
 ```
 
 under the hood this would transpile to:
 
 ```javascript
 @apiSuccess {String} jobTitle Job title
-@apiSuccess {Object} personalDetails Empoyer personal details
+@apiSuccess {Object} personalDetails Employer personal details
 @apiSuccess {String} personalDetails.name
 @apiSuccess {Number} personalDetails.age
 ```
@@ -62,5 +66,5 @@ under the hood this would transpile to:
 *Note if the `Person` interface is defined in the same file then you can drop the path:*
 
 ```javascript
-@apiInterface {Person}
+@apiSuccessInterface {Person}
 ```

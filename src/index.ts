@@ -2,7 +2,19 @@ import * as ts from 'typescript'
 import * as path from 'path'
 import { Project as Ast, InterfaceDeclaration, PropertySignature, Symbol, SourceFile, NamespaceDeclaration } from 'ts-morph'
 
-export const APIDOC_PLUGIN_TS_CUSTOM_ELEMENT_NAME = 'apiinterface'
+const CUSTOM_ELEMENT_NAMES = {
+  API_SUCCESS_INTERFACE: 'apisuccessinterface',
+  API_PARAM_INTERFACE: 'apiparaminterface',
+  API_QUERY_INTERFACE: 'apiqueryinterface',
+  API_BODY_INTERFACE: 'apibodyinterface'
+}
+
+const APIDOC_ELEMENT_BY_CUSTOM_ELEMENT_NAME = {
+  [CUSTOM_ELEMENT_NAMES.API_SUCCESS_INTERFACE]: 'apiSuccess',
+  [CUSTOM_ELEMENT_NAMES.API_PARAM_INTERFACE]: 'apiParam',
+  [CUSTOM_ELEMENT_NAMES.API_QUERY_INTERFACE]: 'apiQuery',
+  [CUSTOM_ELEMENT_NAMES.API_BODY_INTERFACE]: 'apiBody'
+}
 
 const definitionFilesAddedByUser: {[key: string]: boolean} = {}
 
@@ -49,8 +61,8 @@ export function init (app: Apidoc.App) {
  */
 function parseElements (elements: Apidoc.Element[], element: Apidoc.Element, block: string, filename: string) {
 
-  // We only want to do things with the instance of our custom element.
-  if (element.name !== APIDOC_PLUGIN_TS_CUSTOM_ELEMENT_NAME) return
+  // We only want to do things with the instance of our custom elements.
+  if (!Object.values(CUSTOM_ELEMENT_NAMES).includes(element.name)) return
 
   // Remove the element
   elements.pop()
@@ -59,7 +71,7 @@ function parseElements (elements: Apidoc.Element[], element: Apidoc.Element, blo
   const newElements: Apidoc.Element[] = []
 
   // Get object values
-  const values = parse(element.content)
+  const values = parse(element.content, element.name)
 
   // Only if there are values...
   if (!values) {
@@ -91,19 +103,17 @@ function parseElements (elements: Apidoc.Element[], element: Apidoc.Element, blo
 function parseNative (elements: Apidoc.Element[], newElements: Apidoc.Element[], interfacePath: string, values: ParseResult) {
   setNativeElements(interfacePath, newElements, values)
   elements.push(...newElements)
-
 }
 
 function parseArray (elements: Apidoc.Element[], newElements: Apidoc.Element[], values: ParseResult, interfacePath: string, namespace: NamespaceDeclaration, arrayMatch: ArrayMatch) {
-  const leafName = arrayMatch.interface
-  const matchedInterface = getNamespacedInterface(namespace, leafName)
+  const interfaceName = arrayMatch.interface
+  const matchedInterface = getNamespacedInterface(namespace, interfaceName)
   if (!matchedInterface) {
-    this.log.warn(`Could not find interface «${leafName}» in file «${interfacePath}»`)
+    this.log.warn(`Could not find interface «${interfaceName}» in file «${interfacePath}»`)
     return
   }
-  setArrayElements.call(this, matchedInterface, interfacePath, newElements, values)
+  setArrayElements.call(this, matchedInterface, interfacePath, newElements, values, interfaceName)
   elements.push(...newElements)
-
 }
 
 function parseInterface (elements: Apidoc.Element[], newElements: Apidoc.Element[], values: ParseResult, interfacePath: string, namespace: NamespaceDeclaration, leafName: string) {
@@ -126,6 +136,8 @@ interface ParseResult {
   element: string
   interface: string
   path: string
+  field: string
+  description: string
 }
 
 interface ArrayMatch {
@@ -143,19 +155,22 @@ enum PropType {
 /**
  * Parse element content
  * @param content
+ * @param elementName
  */
-function parse (content: string): ParseResult | null {
+function parse (content: string, elementName: string): ParseResult | null {
   if (content.length === 0) return null
 
-  const parseRegExp = /^(?:\((.+?)\)){0,1}\s*\{(.+?)\}\s*(?:(.+))?/g
+  const parseRegExp = /^(?:\((.+?)\)){0,1}\s*\{(.+?)\}\s*(?:([^\s]*))?\s*(?:(.+))?/g
   const matches = parseRegExp.exec(content)
 
   if (!matches) return null
 
   return {
-    element: matches[3] || 'apiSuccess',
+    element: APIDOC_ELEMENT_BY_CUSTOM_ELEMENT_NAME[elementName],
+    path: matches[1],
     interface: matches[2],
-    path: matches[1]
+    field: matches[3] || '',
+    description: matches[4] || ''
   }
 }
 
@@ -165,18 +180,19 @@ function parse (content: string): ParseResult | null {
  * @param filename
  * @param newElements
  * @param values
- * @param inttype
+ * @param interfaceName
  */
 function setArrayElements (
     matchedInterface: InterfaceDeclaration,
     filename: string,
     newElements: Apidoc.Element[],
     values: ParseResult,
-    inttype?: string
+    interfaceName: string
 ) {
-  const name = values.element
-  newElements.push(getApiSuccessElement(`{Object[]} ${name} ${name}`))
-  setInterfaceElements.call(this, matchedInterface, filename, newElements, values, name)
+  const field = values.field || getDecapitalized(interfaceName)
+  const description = values.description || field
+  newElements.push(getApiElement(values.element, `{Object[]} ${field} ${description}`))
+  setInterfaceElements.call(this, matchedInterface, filename, newElements, values, field)
 }
 /**
  *
@@ -210,7 +226,7 @@ function setInterfaceElements (
     const typeEnum = getPropTypeEnum(prop)
     const propLabel = getPropLabel(typeEnum, propTypeName)
     // Set the element
-    newElements.push(getApiSuccessElement(`{${propLabel}} ${typeDef} ${description}`))
+    newElements.push(getApiElement(values.element, `{${propLabel}} ${typeDef} ${description}`))
 
     // If property is an object or interface then we need to also display the objects properties
     if ([PropType.Object, PropType.Array].includes(typeEnum)) {
@@ -243,10 +259,9 @@ function setNativeElements (
   values: ParseResult
   // inttype?: string
 ) {
-
   const propLabel = getCapitalized(values.interface)
   // Set the element
-  newElements.push(getApiSuccessElement(`{${propLabel}} ${values.element}`))
+  newElements.push(getApiElement(values.element, `{${propLabel}} ${values.field} ${values.description}`))
   return
 }
 
@@ -279,17 +294,17 @@ function setObjectElements<NodeType extends ts.Node = ts.Node> (
 
     // Nothing to do if prop is of native type
     if (isNativeType(propType)) {
-      newElements.push(getApiSuccessElement(`{${getCapitalized(propType)}} ${typeDefLabel} ${desc}`))
+      newElements.push(getApiElement(values.element, `{${getCapitalized(propType)}} ${typeDefLabel} ${desc}`))
       return
     }
 
     const isEnum = valueDeclaration.getType().isEnum()
     if (isEnum) {
-      newElements.push(getApiSuccessElement(`{Enum} ${typeDefLabel} ${desc}`))
+      newElements.push(getApiElement(values.element, `{Enum} ${typeDefLabel} ${desc}`))
       return
     }
 
-    const newElement = getApiSuccessElement(`{Object${propType.includes('[]') ? '[]' : ''}} ${typeDefLabel} ${desc}`)
+    const newElement = getApiElement(values.element, `{Object${propType.includes('[]') ? '[]' : ''}} ${typeDefLabel} ${desc}`)
     newElements.push(newElement)
 
     // If property is an object or interface then we need to also display the objects properties
@@ -368,12 +383,12 @@ function extendInterface (
   }
 }
 
-function getApiSuccessElement (param: string | number): Apidoc.Element {
+function getApiElement (element: string, param: string | number): Apidoc.Element {
   return {
     content: `${param}\n`,
-    name: 'apisuccess',
-    source: `@apiSuccess ${param}\n`,
-    sourceName: 'apiSuccess'
+    name: element.toLowerCase(),
+    source: `@${element} ${param}\n`,
+    sourceName: element
   }
 }
 
@@ -398,10 +413,15 @@ function extractNamespace (
   rootNamespace: NamespacedContext,
   interfaceName: string
 ): { namespace: NamespaceDeclaration | undefined; leafName: string; } {
+  const arrayMatch = matchArrayInterface(interfaceName)
+  interfaceName = arrayMatch
+    ? arrayMatch.interface + '[]'
+    : interfaceName
+
   const isNamespaced = interfaceName.match(/(?:[a-zA-Z0-9_]\.)*[a-zA-Z0-9_]\./i)
 
   const nameSegments = isNamespaced
-    ? interfaceName.replace('[]', '').split('.')
+    ? interfaceName.split('.')
     : [interfaceName]
 
   const namespaces = nameSegments.slice(0, -1)
@@ -440,6 +460,10 @@ function trackUserAddedDefinitionFile (file: SourceFile) {
 
 function getCapitalized (text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
+
+function getDecapitalized (text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1)
 }
 
 function isNativeType (propType: string): boolean {

@@ -29,10 +29,10 @@
         ]
       }
     },
-    "group": "arrayWithBracketsTest",
+    "group": "nativeTypesTest",
     "version": "0.0.0",
     "filename": "native-types/index.ts",
-    "groupTitle": "arrayWithBracketsTest",
+    "groupTitle": "nativeTypesTest",
     "name": "GetApiId"
   }
 ]
