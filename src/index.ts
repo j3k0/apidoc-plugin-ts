@@ -191,6 +191,7 @@ function setArrayElements (
 ) {
   const field = values.field || getDecapitalized(interfaceName)
   const description = values.description || field
+  if (shouldIgnore(description)) return
   newElements.push(getApiElement(values.element, `{Object[]} ${field} ${description}`))
   setInterfaceElements.call(this, matchedInterface, filename, newElements, values, field)
 }
@@ -226,6 +227,7 @@ function setInterfaceElements (
     const typeEnum = getPropTypeEnum(prop)
     const propLabel = getPropLabel(typeEnum, propTypeName)
     // Set the element
+    if (shouldIgnore(description)) return
     newElements.push(getApiElement(values.element, `{${propLabel}} ${typeDef} ${description}`))
 
     // If property is an object or interface then we need to also display the objects properties
@@ -261,6 +263,7 @@ function setNativeElements (
 ) {
   const propLabel = getCapitalized(values.interface)
   // Set the element
+  if (shouldIgnore(values.description)) return
   newElements.push(getApiElement(values.element, `{${propLabel}} ${values.field} ${values.description}`))
   return
 }
@@ -287,6 +290,7 @@ function setObjectElements<NodeType extends ts.Node = ts.Node> (
     if (!isUserDefinedProperty) return // We don't want to include default members in the docs
 
     const documentationComments = property.compilerSymbol.getDocumentationComment(undefined).map((node) => node.text).join()
+    if (shouldIgnore(documentationComments)) return
 
     const desc = documentationComments
       ? `\`${typeDef}.${propName}\` - ${documentationComments}`
@@ -506,4 +510,8 @@ function matchArrayInterface (interfaceName): ArrayMatch | null {
 function isUserDefinedSymbol (symbol: ts.Symbol): boolean {
   const declarationFile = symbol.valueDeclaration.parent.getSourceFile()
   return definitionFilesAddedByUser[declarationFile.fileName]
+}
+
+function shouldIgnore (description: string): boolean {
+  return !!description && ((description.match(/(\s|^)@private(\s|$)/) !== null) || (description.match(/(\s|^)@ignore(\s|$)/) !== null))
 }
