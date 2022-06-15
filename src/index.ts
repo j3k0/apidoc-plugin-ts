@@ -402,7 +402,7 @@ function extendInterface (
 }
 
 function getApiElement (element: string, param: string | number): Apidoc.Element {
-  const elementName = element.split(' ')[0];
+  const elementName = element.split(' ')[0]
   const elementParam = element.slice(elementName.length)
   return {
     content: `${elementParam}${param}\n`,
