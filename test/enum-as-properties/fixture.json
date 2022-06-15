@@ -28,7 +28,7 @@
           },
           {
             "group": "Success 200",
-            "type": "Enum",
+            "type": "String",
             "optional": false,
             "field": "squares.color",
             "description": "<p><code>squares.color</code></p>"

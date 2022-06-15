@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import * as path from 'path'
-import { Project as Ast, InterfaceDeclaration, PropertySignature, Symbol, SourceFile, NamespaceDeclaration } from 'ts-morph'
+import { Project as Ast, InterfaceDeclaration, PropertySignature, Symbol, SourceFile, NamespaceDeclaration, Type } from 'ts-morph'
+import exp from 'constants'
 
 const CUSTOM_ELEMENT_NAMES = {
   API_ERROR_INTERFACE: 'apierrorinterface',
@@ -232,16 +233,16 @@ function setInterfaceElements (
     // Set param type definition and description
     const typeDef = inttype ? `${inttype}.${prop.getName()}` : prop.getName()
     const documentationComments = prop.getJsDocs().map((node) => node.getInnerText()).join()
+    if (shouldIgnore(documentationComments)) return
     const description = documentationComments
       ? `\`${typeDef}\` - ${documentationComments}`
       : `\`${typeDef}\``
 
     // Set property type as a string
-    const propTypeName = prop.getType().getText()
+    const propTypeName = getPropTypeText(prop.getType()) // .getText()
     const typeEnum = getPropTypeEnum(prop)
     const propLabel = getPropLabel(typeEnum, propTypeName)
     // Set the element
-    if (shouldIgnore(description)) return
     newElements.push(getApiElement(values.element, `{${propLabel}} ${typeDef} ${description}`))
 
     // If property is an object or interface then we need to also display the objects properties
@@ -282,6 +283,27 @@ function setNativeElements (
   return
 }
 
+function getUnionTypeText (type: Type): string | undefined | null {
+  return type.getUnionTypes().reduce((expected: string | undefined, type: Type): string | null => {
+    if (expected === undefined) {
+      return getPropTypeText(type)
+    } else if (expected === getPropTypeText(type)) {
+      return expected
+    } else {
+      return null
+    }
+  }, undefined)
+}
+
+function getPropTypeText (type: Type): string {
+  if (type.isUnion()) {
+    const uType = getUnionTypeText(type)
+    if (uType) return uType
+  }
+  if (type.isStringLiteral()) return 'string'
+  return type.getText()
+}
+
 /**
  * Set element if type object
  */
@@ -298,7 +320,7 @@ function setObjectElements<NodeType extends ts.Node = ts.Node> (
 
     const propName = property.getName()
     const typeDefLabel = `${typeDef}.${propName}`
-    const propType = valueDeclaration.getType().getText(valueDeclaration)
+    const propType = getPropTypeText(valueDeclaration.getType()) // .getText(valueDeclaration)
 
     const isUserDefinedProperty = isUserDefinedSymbol(property.compilerSymbol)
     if (!isUserDefinedProperty) return // We don't want to include default members in the docs
@@ -492,7 +514,7 @@ function isNativeType (propType: string): boolean {
 }
 
 function getPropTypeEnum (prop: PropertySignature): PropType {
-  const propType = prop.getType().getText()
+  const propType = getPropTypeText(prop.getType()) // .getType().getText()
 
   const propTypeIsEnum = prop.getType().isEnum()
   const propTypeIsObject = !propTypeIsEnum && !isNativeType(propType)
