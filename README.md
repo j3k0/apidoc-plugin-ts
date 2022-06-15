@@ -18,6 +18,7 @@ The following custom api-doc params are exposed:
 - `@apiQueryInterface`
 - `@apiBodyInterface`
 - `@apiSuccessInterface`
+- `@apiSuccess[XYZ]Interface` - when XYZ is the response HTTP status code (example `404`), which can be in the `5xx` form (`xx` instead of the last 2 digits).
 
 ```javascript
 @CUSTOM_PARAM (optional path to definitions file) {INTERFACE_NAME}
@@ -31,10 +32,12 @@ Given the following interface:
 // filename: ./employers.ts
 
 export interface Employer {
+
   /**
    * Employer job title
    */
   jobTitle: string;
+
   /**
    * Employer personal details
    */
@@ -42,6 +45,12 @@ export interface Employer {
     name: string;
     age: number;
   }
+
+  /**
+   * This field is for internal use.
+   * @private
+   */
+  privateDetails: string;
 }
 ```
 
@@ -65,3 +74,6 @@ under the hood this would transpile to:
 ```javascript
 @apiSuccessInterface {Person}
 ```
+
+You can add `@private` or `@ignore` to the field documentation to omit it from the output.
+
