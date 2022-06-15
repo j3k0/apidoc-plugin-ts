@@ -3,6 +3,7 @@ import * as path from 'path'
 import { Project as Ast, InterfaceDeclaration, PropertySignature, Symbol, SourceFile, NamespaceDeclaration } from 'ts-morph'
 
 const CUSTOM_ELEMENT_NAMES = {
+  API_ERROR_INTERFACE: 'apierrorinterface',
   API_SUCCESS_INTERFACE: 'apisuccessinterface',
   API_PARAM_INTERFACE: 'apiparaminterface',
   API_QUERY_INTERFACE: 'apiqueryinterface',
@@ -10,10 +11,23 @@ const CUSTOM_ELEMENT_NAMES = {
 }
 
 const APIDOC_ELEMENT_BY_CUSTOM_ELEMENT_NAME = {
+  [CUSTOM_ELEMENT_NAMES.API_ERROR_INTERFACE]: 'apiError',
   [CUSTOM_ELEMENT_NAMES.API_SUCCESS_INTERFACE]: 'apiSuccess',
   [CUSTOM_ELEMENT_NAMES.API_PARAM_INTERFACE]: 'apiParam',
   [CUSTOM_ELEMENT_NAMES.API_QUERY_INTERFACE]: 'apiQuery',
   [CUSTOM_ELEMENT_NAMES.API_BODY_INTERFACE]: 'apiBody'
+}
+
+for (let i = 200; i < 600; i++) {
+  const name = `apisuccess${i}interface`
+  CUSTOM_ELEMENT_NAMES[`API_SUCCESS${i}_INTERFACE`] = name
+  APIDOC_ELEMENT_BY_CUSTOM_ELEMENT_NAME[name] = `apiSuccess (${i < 300 ? 'Success' : 'Error'} ${i})`
+}
+
+for (let i = 200; i < 600; i += 100) {
+  const name = `apisuccess${i / 100}xxinterface`
+  CUSTOM_ELEMENT_NAMES[`API_SUCCESS${i / 100}xx_INTERFACE`] = name
+  APIDOC_ELEMENT_BY_CUSTOM_ELEMENT_NAME[name] = `apiSuccess (${i < 300 ? 'Success' : 'Error'} ${i / 100}xx)`
 }
 
 const definitionFilesAddedByUser: {[key: string]: boolean} = {}
@@ -384,11 +398,13 @@ function extendInterface (
 }
 
 function getApiElement (element: string, param: string | number): Apidoc.Element {
+  const elementName = element.split(' ')[0];
+  const elementParam = element.slice(elementName.length)
   return {
-    content: `${param}\n`,
-    name: element.toLowerCase(),
+    content: `${elementParam}${param}\n`,
+    name: elementName.toLowerCase(),
     source: `@${element} ${param}\n`,
-    sourceName: element
+    sourceName: elementName
   }
 }
 
