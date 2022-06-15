@@ -1,6 +1,6 @@
 {
-  "name": "@geoblink/apidoc-plugin-ts",
-  "version": "2.0.1",
+  "name": "@jchoelt/apidoc-plugin-ts",
+  "version": "2.2.0",
   "description": "A plugin for apidoc leveraging TypeScript interfaces.",
   "main": "dist/index.js",
   "files": [
@@ -18,18 +18,19 @@
   },
   "authors": [
     "Tom Grey",
-    "Geoblink"
+    "Geoblink",
+    "Jean-Christophe Hoelt"
   ],
   "license": "MIT",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/geoblink/apidoc-plugin-ts/issues"
+    "url": "https://github.com/j3k0/apidoc-plugin-ts/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/geoblink/apidoc-plugin-ts.git"
+    "url": "https://github.com/j3k0/apidoc-plugin-ts.git"
   },
   "keywords": [
     "apidoc",
@@ -37,7 +38,7 @@
     "typescript"
   ],
   "peerDependencies": {
-    "apidoc": "^0.17.7"
+    "apidoc": "^0.x.x"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

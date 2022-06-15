@@ -1,19 +1,16 @@
 # apidoc-plugin-ts
 
-[![Build Status](https://travis-ci.org/geoblink/apidoc-plugin-ts.svg?branch=master)](https://travis-ci.org/geoblink/apidoc-plugin-ts)
-[![npm](https://img.shields.io/npm/v/@geoblink/apidoc-plugin-ts.svg)](https://www.npmjs.com/package/@geoblink/apidoc-plugin-ts) [![Greenkeeper badge](https://badges.greenkeeper.io/geoblink/apidoc-plugin-ts.svg)](https://greenkeeper.io/)
-
 A plugin for [apidoc](https://www.npmjs.com/package/apidoc) that injects params like `@apiSuccess` and `@apiParam` from TypeScript interfaces.
 Supports extended and nested interfaces.
 
 ## Getting started
 
 ```javascript
-npm install --save-dev apidoc @geoblink/apidoc-plugin-ts
+npm install --save-dev apidoc @jchoelt/apidoc-plugin-ts
 ```
 
 ```javascript
-yarn add -D apidoc @geoblink/apidoc-plugin-ts
+yarn add -D apidoc @jchoelt/apidoc-plugin-ts
 ```
 
 The following custom api-doc params are exposed:
