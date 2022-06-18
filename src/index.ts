@@ -270,17 +270,17 @@ function setInterfaceElements (
  * @param {string} description
  * @return {sting}
  */
-function markOptional(name, hasQuestionToken, description) {
-  if (hasRequiredTag(description)) return name;
-  if (hasOptionalTag(description)) return `[${name}]`;
-  return hasQuestionToken ? `[${name}]` : name;
+function markOptional (name, hasQuestionToken, description) {
+  if (hasRequiredTag(description)) return name
+  if (hasOptionalTag(description)) return `[${name}]`
+  return hasQuestionToken ? `[${name}]` : name
 }
 
 /**
  * @param {string} description
  * @return {string}
  */
-function removeTags(description) {
+function removeTags (description) {
   return description.replace('@required', '').replace('@optional', '')
   // return description.replace(/(\s|^)@(required|optional)(\s|$)/, '\1\2')
 }
@@ -353,7 +353,7 @@ function setObjectElements<NodeType extends ts.Node = ts.Node> (
       ? `\`${typeDef}.${propName}\` - ${documentationComments}`
       : `\`${typeDef}.${propName}\``
 
-    const isNullable = property.getDeclaredType().isNullable();
+    const isNullable = property.getDeclaredType().isNullable()
 
     // Nothing to do if prop is of native type
     if (isNativeType(propType)) {
