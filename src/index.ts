@@ -207,7 +207,7 @@ function setArrayElements (
   const field = values.field || getDecapitalized(interfaceName)
   const description = values.description || field
   if (shouldIgnore(description)) return
-  newElements.push(getApiElement(values.element, `{Object[]} ${field} ${description}`))
+  newElements.push(getApiElement(values.element, `{Object[]} ${markOptional(field, false, description)} ${removeTags(description)}`))
   setInterfaceElements.call(this, matchedInterface, filename, newElements, values, field)
 }
 /**
@@ -243,7 +243,7 @@ function setInterfaceElements (
     const typeEnum = getPropTypeEnum(prop)
     const propLabel = getPropLabel(typeEnum, propTypeName)
     // Set the element
-    newElements.push(getApiElement(values.element, `{${propLabel}} ${typeDef} ${description}`))
+    newElements.push(getApiElement(values.element, `{${propLabel}} ${markOptional(typeDef, prop.hasQuestionToken(), description)} ${removeTags(description)}`))
 
     // If property is an object or interface then we need to also display the objects properties
     if ([PropType.Object, PropType.Array].includes(typeEnum)) {
@@ -265,6 +265,27 @@ function setInterfaceElements (
 }
 
 /**
+ * @param {string} name
+ * @param {boolean} hasQuestionToken
+ * @param {string} description
+ * @return {sting}
+ */
+function markOptional(name, hasQuestionToken, description) {
+  if (hasRequiredTag(description)) return name;
+  if (hasOptionalTag(description)) return `[${name}]`;
+  return hasQuestionToken ? `[${name}]` : name;
+}
+
+/**
+ * @param {string} description
+ * @return {string}
+ */
+function removeTags(description) {
+  return description.replace('@required', '').replace('@optional', '')
+  // return description.replace(/(\s|^)@(required|optional)(\s|$)/, '\1\2')
+}
+
+/**
  *
  * @param filename
  * @param newElements
@@ -279,7 +300,7 @@ function setNativeElements (
   const propLabel = getCapitalized(values.interface)
   // Set the element
   if (shouldIgnore(values.description)) return
-  newElements.push(getApiElement(values.element, `{${propLabel}} ${values.field} ${values.description}`))
+  newElements.push(getApiElement(values.element, `{${propLabel}} ${markOptional(values.field, false, values.description)} ${removeTags(values.description)}`))
   return
 }
 
@@ -332,19 +353,21 @@ function setObjectElements<NodeType extends ts.Node = ts.Node> (
       ? `\`${typeDef}.${propName}\` - ${documentationComments}`
       : `\`${typeDef}.${propName}\``
 
+    const isNullable = property.getDeclaredType().isNullable();
+
     // Nothing to do if prop is of native type
     if (isNativeType(propType)) {
-      newElements.push(getApiElement(values.element, `{${getCapitalized(propType)}} ${typeDefLabel} ${desc}`))
+      newElements.push(getApiElement(values.element, `{${getCapitalized(propType)}} ${markOptional(typeDefLabel, isNullable, desc)} ${removeTags(desc)}`))
       return
     }
 
     const isEnum = valueDeclaration.getType().isEnum()
     if (isEnum) {
-      newElements.push(getApiElement(values.element, `{Enum} ${typeDefLabel} ${desc}`))
+      newElements.push(getApiElement(values.element, `{Enum} ${markOptional(typeDefLabel, isNullable, desc)} ${removeTags(desc)}`))
       return
     }
 
-    const newElement = getApiElement(values.element, `{Object${propType.includes('[]') ? '[]' : ''}} ${typeDefLabel} ${desc}`)
+    const newElement = getApiElement(values.element, `{Object${propType.includes('[]') ? '[]' : ''}} ${markOptional(typeDefLabel, isNullable, desc)} ${removeTags(desc)}`)
     newElements.push(newElement)
 
     // If property is an object or interface then we need to also display the objects properties
@@ -552,4 +575,12 @@ function isUserDefinedSymbol (symbol: ts.Symbol): boolean {
 
 function shouldIgnore (description: string): boolean {
   return !!description && ((description.match(/(\s|^)@private(\s|$)/) !== null) || (description.match(/(\s|^)@ignore(\s|$)/) !== null))
+}
+
+function hasOptionalTag (description: string): boolean {
+  return !!description && (description.match(/(\s|^)@optional(\s|$)/) !== null)
+}
+
+function hasRequiredTag (description: string): boolean {
+  return !!description && (description.match(/(\s|^)@required(\s|$)/) !== null)
 }
