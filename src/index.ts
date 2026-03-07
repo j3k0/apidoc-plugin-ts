@@ -322,7 +322,7 @@ function getPropTypeText (type: Type): string {
     if (uType) return uType
   }
   if (type.isStringLiteral()) return 'string'
-  return type.getText()
+  return type.getText(undefined, ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope)
 }
 
 /**
@@ -346,7 +346,12 @@ function setObjectElements<NodeType extends ts.Node = ts.Node> (
     const isUserDefinedProperty = isUserDefinedSymbol(property.compilerSymbol)
     if (!isUserDefinedProperty) return // We don't want to include default members in the docs
 
-    const documentationComments = property.compilerSymbol.getDocumentationComment(undefined).map((node) => node.text).join()
+    let documentationComments = ''
+    try {
+      documentationComments = property.compilerSymbol.getDocumentationComment(undefined).map((node) => node.text).join()
+    } catch (err) {
+      // getDocumentationComment(undefined) can throw when a type checker is needed
+    }
     if (shouldIgnore(documentationComments)) return
 
     const desc = documentationComments
