@@ -514,8 +514,14 @@ function getNamespacedInterface (
   return namespace.getInterface(interfaceName)
 }
 function getInterface (interfacePath: string, interfaceName: string): InterfaceDeclaration | undefined {
+  // Strip import("...") prefixes from type text (e.g. import("/path/to/foo.types").TypeName)
+  const importMatch = interfaceName.match(/^import\(".*"\)\.(.+)$/)
+  if (importMatch) {
+    interfaceName = importMatch[1]
+  }
   const interfaceFile = parseDefinitionFiles(interfacePath)
   const { namespace, leafName } = extractNamespace.call(this, interfaceFile, interfaceName)
+  if (!namespace) return undefined
   return getNamespacedInterface.call(this, namespace, leafName)
 }
 

@@ -1,0 +1,45 @@
+[
+  {
+    "type": "get",
+    "url": "/api/:id",
+    "title": "",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "inner",
+            "description": "<p><code>inner</code></p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inner.name",
+            "description": "<p><code>inner.name</code></p>"
+          }
+        ]
+      }
+    },
+    "group": "dottedFilenameTest",
+    "version": "0.0.0",
+    "filename": "dotted-filename/index.ts",
+    "groupTitle": "dottedFilenameTest",
+    "name": "GetApiId"
+  }
+]

@@ -39,6 +39,10 @@ const tests = [
   {
     only: false,
     name: 'elements'
+  },
+  {
+    only: false,
+    name: 'dotted-filename'
   }
 ]
 describe('Apidoc TS Plugin', () => {
