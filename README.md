@@ -77,3 +77,21 @@ under the hood this would transpile to:
 
 You can add `@private` or `@ignore` to the field documentation to omit it from the output.
 
+## Troubleshooting
+
+### Phantom API entries when referencing external files
+
+When using a path to reference an interface in an external file (e.g. `@apiSuccessInterface (../../types/api.ts) {MyType}`), you may see phantom entries in the generated documentation with empty `type`, `url`, and `name` fields, and the file's absolute path as the group title.
+
+This happens because **apidoc independently scans all `.ts` files** in its configured source directories. If the external type file falls within apidoc's scan path, apidoc will try to parse its JSDoc comments as API documentation blocks, producing these phantom entries.
+
+To fix this, exclude the type definition files from apidoc's scan using `excludeFilters` in your `apidoc.json`:
+
+```json
+{
+  "excludeFilters": ["types/"]
+}
+```
+
+Alternatively, move your type definition files outside of apidoc's configured source directories.
+
